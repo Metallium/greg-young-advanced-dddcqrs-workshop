@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Tests
+namespace Trader
 {
     public class SendBackIn : IMessage
     {

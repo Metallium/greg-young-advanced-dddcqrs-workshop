@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using Trader;
 
 namespace Tests
 {
-    public class InteractionTests
+    public class TraderProcessManagerTests
     {
         [Test]
         public void EmitsStopLossPricesUpdatedTest()
@@ -16,10 +17,10 @@ namespace Tests
 
             AssertEmits(
                 bus,
-                () => processManager.Handle(new PositionAcquiredEvent {Amount = 1, PricePerItem = 100}),
+                () => processManager.Handle(new PositionAcquired {Amount = 1, PricePerItem = 100}),
                 new[]
                 {
-                    new StopLossPriceUpdatedEvent {NewStopLossPrice = 90}
+                    new StopLossPriceUpdated {NewStopLossPrice = 90}
                 });
         }
 
@@ -28,9 +29,9 @@ namespace Tests
         {
             var bus = new TestBus();
             var processManager = new ProcessManager(bus);
-            processManager.Handle(new PositionAcquiredEvent {Amount = 1, PricePerItem = 100});
+            processManager.Handle(new PositionAcquired {Amount = 1, PricePerItem = 100});
 
-            AssertEmits(bus, () => processManager.Handle(new PriceUpdatedEvent {NewPricePerItem = 110}), new[]
+            AssertEmits(bus, () => processManager.Handle(new PriceUpdated {NewPricePerItem = 110}), new[]
             {
                 new SendBackIn(TimeSpan.FromSeconds(10), new TenSecondsPassed {Price = 110}),
                 new SendBackIn(TimeSpan.FromSeconds(13), new ThirteenSecondsPassed {Price = 110})
@@ -42,12 +43,12 @@ namespace Tests
         {
             var bus = new TestBus();
             var processManager = new ProcessManager(bus);
-            processManager.Handle(new PositionAcquiredEvent {Amount = 1, PricePerItem = 100});
-            processManager.Handle(new PriceUpdatedEvent {NewPricePerItem = 110});
+            processManager.Handle(new PositionAcquired {Amount = 1, PricePerItem = 100});
+            processManager.Handle(new PriceUpdated {NewPricePerItem = 110});
 
             AssertEmits(bus, () => { processManager.Handle(new TenSecondsPassed {Price = 110}); }, new[]
             {
-                new StopLossPriceUpdatedEvent {NewStopLossPrice = (int) Math.Floor(ProcessManager.StopLossRatio*110)}
+                new StopLossPriceUpdated {NewStopLossPrice = (int) Math.Floor(ProcessManager.StopLossRatio*110)}
             });
         }
 
@@ -56,9 +57,9 @@ namespace Tests
         {
             var bus = new TestBus();
             var processManager = new ProcessManager(bus);
-            processManager.Handle(new PositionAcquiredEvent {Amount = 1, PricePerItem = 100});
-            processManager.Handle(new PriceUpdatedEvent {NewPricePerItem = 200});
-            processManager.Handle(new PriceUpdatedEvent {NewPricePerItem = 150});
+            processManager.Handle(new PositionAcquired {Amount = 1, PricePerItem = 100});
+            processManager.Handle(new PriceUpdated {NewPricePerItem = 200});
+            processManager.Handle(new PriceUpdated {NewPricePerItem = 150});
 
             AssertEmits(bus, () =>
             {
@@ -66,7 +67,7 @@ namespace Tests
                 processManager.Handle(new TenSecondsPassed {Price = 150});
             }, new[]
             {
-                new StopLossPriceUpdatedEvent {NewStopLossPrice = (int) Math.Floor(ProcessManager.StopLossRatio*150)}
+                new StopLossPriceUpdated {NewStopLossPrice = (int) Math.Floor(ProcessManager.StopLossRatio*150)}
             });
         }
 
@@ -75,9 +76,9 @@ namespace Tests
         {
             var bus = new TestBus();
             var processManager = new ProcessManager(bus);
-            processManager.Handle(new PositionAcquiredEvent {Amount = 1, PricePerItem = 100});
-            processManager.Handle(new PriceUpdatedEvent {NewPricePerItem = 110});
-            processManager.Handle(new PriceUpdatedEvent {NewPricePerItem = 90});
+            processManager.Handle(new PositionAcquired {Amount = 1, PricePerItem = 100});
+            processManager.Handle(new PriceUpdated {NewPricePerItem = 110});
+            processManager.Handle(new PriceUpdated {NewPricePerItem = 90});
 
             AssertEmitsNothing(bus, () =>
             {
@@ -91,8 +92,8 @@ namespace Tests
         {
             var bus = new TestBus();
             var processManager = new ProcessManager(bus);
-            processManager.Handle(new PositionAcquiredEvent {Amount = 1, PricePerItem = 100});
-            processManager.Handle(new PriceUpdatedEvent {NewPricePerItem = 89});
+            processManager.Handle(new PositionAcquired {Amount = 1, PricePerItem = 100});
+            processManager.Handle(new PriceUpdated {NewPricePerItem = 89});
 
             AssertEmits(bus, () => processManager.Handle(new ThirteenSecondsPassed {Price = 89}), new[]
             {
@@ -105,9 +106,9 @@ namespace Tests
         {
             var bus = new TestBus();
             var processManager = new ProcessManager(bus);
-            processManager.Handle(new PositionAcquiredEvent {Amount = 1, PricePerItem = 100});
-            processManager.Handle(new PriceUpdatedEvent {NewPricePerItem = 89});
-            processManager.Handle(new PriceUpdatedEvent {NewPricePerItem = 90});
+            processManager.Handle(new PositionAcquired {Amount = 1, PricePerItem = 100});
+            processManager.Handle(new PriceUpdated {NewPricePerItem = 89});
+            processManager.Handle(new PriceUpdated {NewPricePerItem = 90});
 
             AssertEmitsNothing(bus, () =>
             {
@@ -121,8 +122,8 @@ namespace Tests
         {
             var bus = new TestBus();
             var processManager = new ProcessManager(bus);
-            processManager.Handle(new PositionAcquiredEvent {Amount = 1, PricePerItem = 100});
-            processManager.Handle(new PriceUpdatedEvent {NewPricePerItem = 100});
+            processManager.Handle(new PositionAcquired {Amount = 1, PricePerItem = 100});
+            processManager.Handle(new PriceUpdated {NewPricePerItem = 100});
 
             AssertEmitsNothing(bus, () => { processManager.Handle(new ThirteenSecondsPassed {Price = 100}); });
         }

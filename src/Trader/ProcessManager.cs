@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Tests
+namespace Trader
 {
     public class ProcessManager
     {
@@ -21,22 +21,22 @@ namespace Tests
         private IList<int> LastTenSecondsPrices { get; } = new List<int>();
         private IList<int> LastThirteenSecondsPrices { get; } = new List<int>();
 
-        public void Handle(PositionAcquiredEvent positionAcquiredEvent)
+        public void Handle(PositionAcquired positionAcquired)
         {
             if (IsInitialized)
             {
                 throw new NotImplementedException();
             }
-            CurrentPricePerItem = positionAcquiredEvent.PricePerItem;
+            CurrentPricePerItem = positionAcquired.PricePerItem;
 
-            UpdateStopLossPrice(StopLossRatio*positionAcquiredEvent.PricePerItem);
+            UpdateStopLossPrice(StopLossRatio*positionAcquired.PricePerItem);
 
             IsInitialized = true;
         }
 
         private void UpdateStopLossPrice(double newPrice)
         {
-            var stopLossPriceUpdatedEvent = new StopLossPriceUpdatedEvent
+            var stopLossPriceUpdatedEvent = new StopLossPriceUpdated
             {
                 NewStopLossPrice = (int) Math.Floor(newPrice)
             };
@@ -44,11 +44,11 @@ namespace Tests
             _bus.Fire(stopLossPriceUpdatedEvent);
         }
 
-        public void Handle(PriceUpdatedEvent priceUpdatedEvent)
+        public void Handle(PriceUpdated priceUpdated)
         {
-            CurrentPricePerItem = priceUpdatedEvent.NewPricePerItem;
+            CurrentPricePerItem = priceUpdated.NewPricePerItem;
 
-            var price = priceUpdatedEvent.NewPricePerItem;
+            var price = priceUpdated.NewPricePerItem;
             LastTenSecondsPrices.Add(price);
             LastThirteenSecondsPrices.Add(price);
 
