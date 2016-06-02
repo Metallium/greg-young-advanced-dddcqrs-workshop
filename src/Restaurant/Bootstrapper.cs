@@ -33,23 +33,33 @@ namespace Restaurant
                 "Greg",
                 "Bro"
             };
-            var assistantManager = new AssistantManager(
-                new Cashier(new Printer())
-                );
+            var printer = AsQueueable(new Printer());
+            var cashier = AsQueueable(new Cashier(printer));
+            var assistantManager = AsQueueable(new AssistantManager(cashier));
 
             var queuedHandlers = cookNames
                 .Select(cookName => new Cook(cookName, assistantManager))
-                .Select(x => new QueuedHandler(x))
+                .Select(AsQueueable)
                 .ToList();
-            var waiter = new Waiter(
-                new RoundRobinDispatcher(
-                    queuedHandlers)
-                );
+            var waiter = new Waiter(new RoundRobinDispatcher(queuedHandlers));
             return new WireUpResult
             {
                 Waiter = waiter,
-                Startables = queuedHandlers.Cast<IStartable>().ToList()
+                Startables = queuedHandlers
+                    .Concat(new[]
+                    {
+                        printer,
+                        cashier,
+                        assistantManager
+                    })
+                    .Cast<IStartable>()
+                    .ToList()
             };
+        }
+
+        private static IHandleOrder AsQueueable(IHandleOrder orderHandler)
+        {
+            return new QueuedHandler(orderHandler);
         }
     }
 }

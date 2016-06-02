@@ -6,7 +6,7 @@ namespace Restaurant
     {
         public void Handle(Order order)
         {
-            Console.WriteLine(order.MutableContainer.ToString());
+            Console.WriteLine("[printer]: " + order.MutableContainer);
         }
     }
 }

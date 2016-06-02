@@ -19,6 +19,9 @@ namespace Restaurant
             Thread.Sleep(1000);
 
             order.IsPaid = true;
+
+            Console.WriteLine($"[cashier]: took payment for {order.OrderId}.");
+
             _handleOrder.Handle(new Order(order));
         }
     }
