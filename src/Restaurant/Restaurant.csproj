@@ -56,6 +56,7 @@
     <Compile Include="IHandleOrder.cs" />
     <Compile Include="IHorn.cs" />
     <Compile Include="LineItemDto.cs" />
+    <Compile Include="MoreFairDispatcher.cs" />
     <Compile Include="QueuedHandler.cs" />
     <Compile Include="RoundRobinDispatcher.cs" />
     <Compile Include="Multiplexor.cs" />

@@ -15,7 +15,7 @@ namespace Restaurant
             var horn = new ConsoleHorn();
             var wireUpResult = WireUp();
             wireUpResult.Startables.ForEach(x => x.Start());
-            StartPrintingQueueStats(horn, wireUpResult.QueuedHandlers);
+            StartPrintingQueueStats(horn, wireUpResult.TrackableHandlers);
             var ordersCount = 100;
             for (var i = 0; i < ordersCount; ++i)
             {
@@ -38,7 +38,7 @@ namespace Restaurant
                 {
                     var stats = queuedHandlers.ToDictionary(x => x.QueueName, x => x.QueueDepth);
                     horn.Note("[stats]: " + JsonConvert.SerializeObject(stats, Formatting.Indented));
-                    Thread.Sleep(1000);
+                    Thread.Sleep(500);
                 }
             }) {IsBackground = true};
             thread.Start();
@@ -59,26 +59,28 @@ namespace Restaurant
             var cashier = AsQueueable(nameof(Cashier), new Cashier(horn, printer));
             var assistantManager = AsQueueable(nameof(AssistantManager), new AssistantManager(horn, cashier));
             var random = new Random();
-            var queuedHandlers = cookNames
+            var cooks = cookNames
                 .Select(
                     cookName =>
                         AsQueueable($"{nameof(Cook)}-{cookName}",
                             new Cook(horn, cookName, random.Next(0, 10000), assistantManager)))
-                .Concat(new[]
-                {
-                    printer,
-                    cashier,
-                    assistantManager
-                })
                 .ToList();
-            var waiter = new Waiter(horn, new RoundRobinDispatcher(queuedHandlers));
+            var megaCook = AsQueueable("CookDispatcher", new MoreFairDispatcher(cooks));
+            var waiter = new Waiter(horn, megaCook);
+            var trackableHandlers = cooks.Concat(new[]
+            {
+                megaCook,
+                printer,
+                cashier,
+                assistantManager
+            }).ToList();
             return new WireUpResult
             {
                 Waiter = waiter,
-                Startables = queuedHandlers
+                Startables = trackableHandlers
                     .Cast<IStartable>()
                     .ToList(),
-                QueuedHandlers = queuedHandlers
+                TrackableHandlers = trackableHandlers
             };
         }
 
