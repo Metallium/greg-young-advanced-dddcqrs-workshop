@@ -53,6 +53,7 @@
     <Compile Include="ConsoleHorn.cs" />
     <Compile Include="Cook.cs" />
     <Compile Include="EnumerableExtensions.cs" />
+    <Compile Include="HandleExtensions.cs" />
     <Compile Include="IHandle.cs" />
     <Compile Include="IHorn.cs" />
     <Compile Include="IMessage.cs" />

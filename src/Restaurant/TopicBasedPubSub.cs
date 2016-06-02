@@ -11,24 +11,24 @@ namespace Restaurant
 
     public class TopicBasedPubSub : IPublisher
     {
-        private readonly Dictionary<string, object> _subs;
+        private readonly Dictionary<string, IHandle<IMessage>> _subs;
 
         public TopicBasedPubSub()
         {
-            _subs = new Dictionary<string, object>();
+            _subs = new Dictionary<string, IHandle<IMessage>>();
         }
 
         public void Publish<TMessage>(TMessage message)
             where TMessage : class, IMessage
         {
             var handler = _subs[typeof(TMessage).FullName];
-            ((IHandle<TMessage>)handler).Handle(message);
+            handler.WidenFrom<TMessage, IMessage>().Handle(message);
         }
 
         public void SubscribeByType<TMessage>(IHandle<TMessage> handler)
             where TMessage : class, IMessage
         {
-            _subs.Add(typeof(TMessage).FullName, handler);
+            _subs.Add(typeof(TMessage).FullName, handler.NarrowTo<IMessage, TMessage>());
         }
     }
 }
