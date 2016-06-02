@@ -6,13 +6,13 @@ namespace Restaurant
 {
     public class AssistantManager : IHandleOrder
     {
+        private readonly IPublisher _publisher;
         private readonly IHorn _horn;
-        private readonly IHandleOrder _orderHandler;
 
-        public AssistantManager(IHorn horn, IHandleOrder orderHandler)
+        public AssistantManager(IPublisher publisher, IHorn horn)
         {
+            _publisher = publisher;
             _horn = horn;
-            _orderHandler = orderHandler;
         }
 
         public void Handle(Order order)
@@ -33,7 +33,7 @@ namespace Restaurant
             order.Tax = tax;
             order.Totals = tax + totalPerItems;
 
-            _orderHandler.Handle(new Order(order));
+            _publisher.Publish(TopicNames.OrderCalculated, new Order(order));
         }
     }
 }

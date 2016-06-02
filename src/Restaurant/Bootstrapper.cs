@@ -54,25 +54,37 @@ namespace Restaurant
                 "Greg",
                 "Bro"
             };
-
+            var topicBasedPubSub = new TopicBasedPubSub();
             var printer = new Printer(horn);
-            var cashier = AsQueueable(nameof(Cashier), new Cashier(horn, printer));
-            var assistantManager = AsQueueable(nameof(AssistantManager), new AssistantManager(horn, cashier));
+
+            var cashier = AsQueueable(nameof(Cashier), new Cashier(topicBasedPubSub, horn));
+
+            var assistantManager = AsQueueable(nameof(AssistantManager), new AssistantManager(topicBasedPubSub, horn));
+
             var random = new Random();
             var cooks = cookNames
                 .Select(
                     cookName =>
                         AsQueueable($"{nameof(Cook)}-{cookName}",
-                            new Cook(horn, cookName, random.Next(0, 10000), assistantManager)))
+                            new Cook(topicBasedPubSub, horn, cookName, random.Next(0, 10000))))
                 .ToList();
+
             var megaCook = AsQueueable("CookDispatcher", new MoreFairDispatcher(cooks));
-            var waiter = new Waiter(horn, megaCook);
+
+            var waiter = new Waiter(topicBasedPubSub, horn);
+
+            topicBasedPubSub.Subscribe(TopicNames.OrderPaid, printer);
+            topicBasedPubSub.Subscribe(TopicNames.OrderCalculated, cashier);
+            topicBasedPubSub.Subscribe(TopicNames.OrderCooked, assistantManager);
+            topicBasedPubSub.Subscribe(TopicNames.OrderPlaced, megaCook);
+
             var trackableHandlers = cooks.Concat(new[]
             {
                 megaCook,
                 cashier,
                 assistantManager
             }).ToList();
+
             return new WireUpResult
             {
                 Waiter = waiter,

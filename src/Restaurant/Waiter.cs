@@ -6,13 +6,13 @@ namespace Restaurant
 {
     public class Waiter
     {
+        private readonly IPublisher _publisher;
         private readonly IHorn _horn;
-        private readonly IHandleOrder _orderHandler;
 
-        public Waiter(IHorn horn, IHandleOrder orderHandler)
+        public Waiter(IPublisher publisher, IHorn horn)
         {
+            _publisher = publisher;
             _horn = horn;
-            _orderHandler = orderHandler;
         }
 
         public Guid PlaceNewOrder(IDictionary<string, int> itemQuantitySpec)
@@ -26,7 +26,7 @@ namespace Restaurant
             };
 
             _horn.Say($"[waiter]: placing new order {order.OrderId}.");
-            _orderHandler.Handle(new Order(order));
+            _publisher.Publish(TopicNames.OrderPlaced, new Order(order));
             _horn.Say($"[waiter]: placed new order {order.OrderId}.");
 
             return orderId;
