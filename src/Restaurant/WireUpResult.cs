@@ -6,5 +6,6 @@ namespace Restaurant
     {
         public IList<IStartable> Startables { get; set; }
         public Waiter Waiter { get; set; }
+        public IList<QueuedHandler> QueuedHandlers { get; set; }
     }
 }

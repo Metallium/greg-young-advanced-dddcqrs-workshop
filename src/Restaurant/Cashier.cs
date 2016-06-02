@@ -16,7 +16,7 @@ namespace Restaurant
         {
             Console.WriteLine($"[cashier]: taking payment for {order.OrderId}.");
 
-            Thread.Sleep(1000);
+            Thread.Sleep(500);
 
             order.IsPaid = true;
 

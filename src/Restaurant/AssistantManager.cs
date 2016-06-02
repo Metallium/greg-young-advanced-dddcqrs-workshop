@@ -17,7 +17,7 @@ namespace Restaurant
         {
             Console.WriteLine($"[asstManager]: calculating prices for {order.OrderId}.");
 
-            Thread.Sleep(1000);
+            Thread.Sleep(250);
             var random = new Random();
 
             order.LineItems = order.LineItems.Select(x => new LineItemDto

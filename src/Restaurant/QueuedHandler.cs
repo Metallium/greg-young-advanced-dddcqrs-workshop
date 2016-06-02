@@ -11,12 +11,16 @@ namespace Restaurant
 
     public class QueuedHandler : IHandleOrder, IStartable
     {
+        public string QueueName { get; }
+        public int QueueDepth => _concurrentQueue.Count;
+
         private readonly IHandleOrder _orderHandler;
         private readonly ConcurrentQueue<Order> _concurrentQueue;
         private bool _started;
 
-        public QueuedHandler(IHandleOrder orderHandler)
+        public QueuedHandler(string queueName, IHandleOrder orderHandler)
         {
+            QueueName = queueName;
             _orderHandler = orderHandler;
             _concurrentQueue = new ConcurrentQueue<Order>();
         }
