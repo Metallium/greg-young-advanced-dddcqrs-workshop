@@ -15,7 +15,7 @@ namespace Restaurant
 
         public void Handle(Order order)
         {
-            Console.WriteLine($"Asst manager: calculating prices for {order.OrderId}.");
+            Console.WriteLine($"[asstManager]: calculating prices for {order.OrderId}.");
 
             Thread.Sleep(1000);
             var random = new Random();

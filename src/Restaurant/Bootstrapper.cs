@@ -9,26 +9,32 @@ namespace Restaurant
         public static void Main()
         {
             var ordersCount = 10;
+            var cookNames = new[]
+            {
+                "Joe",
+                "Greg",
+                "Bro"
+            };
+            var assistantManager = new AssistantManager(
+                new Cashier(new Printer())
+                );
+            var waiter = new Waiter(
+                new RoundRobinDispatcher(
+                    cookNames.Select(cookName => new Cook(cookName, assistantManager))
+                    )
+                );
+
             for (var i = 0; i < ordersCount; ++i)
             {
-                var assistantManager = new AssistantManager(
-                    new Cashier(new Printer())
-                    );
-                var orderId = new Waiter(
-                    new Multiplexor(
-                        Enumerable.Range(0, 3).Select(x => new Cook(assistantManager))
-                        )
-                    )
+                var orderId = waiter
                     .PlaceNewOrder(new Dictionary<string, int>
                     {
                         {"meat", 2}
                     });
-                Console.WriteLine($"Placed an order {orderId}.");
-
+                Console.WriteLine($"[outer user]: got order handle {orderId}.");
             }
-            Console.WriteLine("Placed all orders.");
+            Console.WriteLine("[outer user]: placed all orders.");
             Console.ReadKey(false);
         }
-
     }
 }

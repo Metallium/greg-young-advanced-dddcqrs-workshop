@@ -14,7 +14,7 @@ namespace Restaurant
 
         public void Handle(Order order)
         {
-            Console.WriteLine($"Cashier: taking payment for {order.OrderId}.");
+            Console.WriteLine($"[cashier]: taking payment for {order.OrderId}.");
 
             Thread.Sleep(1000);
 
