@@ -36,9 +36,9 @@ namespace Restaurant
             var printer = AsQueueable(new Printer());
             var cashier = AsQueueable(new Cashier(printer));
             var assistantManager = AsQueueable(new AssistantManager(cashier));
-
+            var random = new Random();
             var queuedHandlers = cookNames
-                .Select(cookName => new Cook(cookName, assistantManager))
+                .Select(cookName => new Cook(cookName, random.Next(3000), assistantManager))
                 .Select(AsQueueable)
                 .ToList();
             var waiter = new Waiter(new RoundRobinDispatcher(queuedHandlers));
