@@ -55,7 +55,7 @@ namespace Restaurant
                 "Bro"
             };
 
-            var printer = AsQueueable(nameof(Printer), new Printer(horn));
+            var printer = new Printer(horn);
             var cashier = AsQueueable(nameof(Cashier), new Cashier(horn, printer));
             var assistantManager = AsQueueable(nameof(AssistantManager), new AssistantManager(horn, cashier));
             var random = new Random();
@@ -70,7 +70,6 @@ namespace Restaurant
             var trackableHandlers = cooks.Concat(new[]
             {
                 megaCook,
-                printer,
                 cashier,
                 assistantManager
             }).ToList();
