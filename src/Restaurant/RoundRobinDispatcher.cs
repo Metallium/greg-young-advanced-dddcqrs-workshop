@@ -16,7 +16,6 @@ namespace Restaurant
 
         public void Handle(Order order)
         {
-            Console.WriteLine($"RoundRobin dispatcher dispatches order {order.OrderId}.");
             _queue.Peek().Handle(order);
             _queue.Enqueue(_queue.Dequeue());
         }

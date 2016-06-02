@@ -15,7 +15,6 @@ namespace Restaurant
 
         public void Handle(Order order)
         {
-            Console.WriteLine($"Multiplexor dispatches order {order.OrderId} to {_orderHandlers.Count} handlers.");
             _orderHandlers.ForEach(x => x.Handle(order));
         }
     }

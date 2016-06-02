@@ -8,11 +8,14 @@ namespace Restaurant
 {
     public static class Bootstrapper
     {
+        const bool PrintDetails = false;
+
         public static void Main()
         {
+            var horn = new ConsoleHorn();
             var wireUpResult = WireUp();
             wireUpResult.Startables.ForEach(x => x.Start());
-            StartPrintingQueueStats(wireUpResult.QueuedHandlers);
+            StartPrintingQueueStats(horn, wireUpResult.QueuedHandlers);
             var ordersCount = 100;
             for (var i = 0; i < ordersCount; ++i)
             {
@@ -21,24 +24,20 @@ namespace Restaurant
                     {
                         {"meat", 2}
                     });
-                Console.WriteLine($"[outer user]: got order handle {orderId}.");
+                horn.Say($"[outer user]: got order handle {orderId}.");
             }
-            Console.WriteLine("[outer user]: placed all orders.");
+            horn.Say("[outer user]: placed all orders.");
             Console.ReadKey(false);
         }
 
-        private static void StartPrintingQueueStats(IList<QueuedHandler> queuedHandlers)
+        private static void StartPrintingQueueStats(IHorn horn, IList<QueuedHandler> queuedHandlers)
         {
             var thread = new Thread(() =>
             {
                 while (true)
                 {
                     var stats = queuedHandlers.ToDictionary(x => x.QueueName, x => x.QueueDepth);
-                    var previousColor = Console.ForegroundColor;
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("[stats]: " + JsonConvert.SerializeObject(stats, Formatting.Indented));
-                    Console.ForegroundColor = previousColor;
-
+                    horn.Note("[stats]: " + JsonConvert.SerializeObject(stats, Formatting.Indented));
                     Thread.Sleep(1000);
                 }
             }) {IsBackground = true};
@@ -47,21 +46,24 @@ namespace Restaurant
 
         private static WireUpResult WireUp()
         {
+            var horn = PrintDetails ? (IHorn)new ConsoleHorn() : new SilentHorn();
+
             var cookNames = new[]
             {
                 "Joe",
                 "Greg",
                 "Bro"
             };
-            var printer = AsQueueable(nameof(Printer), new Printer());
-            var cashier = AsQueueable(nameof(Cashier), new Cashier(printer));
-            var assistantManager = AsQueueable(nameof(AssistantManager), new AssistantManager(cashier));
+
+            var printer = AsQueueable(nameof(Printer), new Printer(horn));
+            var cashier = AsQueueable(nameof(Cashier), new Cashier(horn, printer));
+            var assistantManager = AsQueueable(nameof(AssistantManager), new AssistantManager(horn, cashier));
             var random = new Random();
             var queuedHandlers = cookNames
                 .Select(
                     cookName =>
                         AsQueueable($"{nameof(Cook)}-{cookName}",
-                            new Cook(cookName, random.Next(0, 10000), assistantManager)))
+                            new Cook(horn, cookName, random.Next(0, 10000), assistantManager)))
                 .Concat(new[]
                 {
                     printer,
@@ -69,7 +71,7 @@ namespace Restaurant
                     assistantManager
                 })
                 .ToList();
-            var waiter = new Waiter(new RoundRobinDispatcher(queuedHandlers));
+            var waiter = new Waiter(horn, new RoundRobinDispatcher(queuedHandlers));
             return new WireUpResult
             {
                 Waiter = waiter,

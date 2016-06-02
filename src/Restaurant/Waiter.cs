@@ -6,10 +6,12 @@ namespace Restaurant
 {
     public class Waiter
     {
+        private readonly IHorn _horn;
         private readonly IHandleOrder _orderHandler;
 
-        public Waiter(IHandleOrder orderHandler)
+        public Waiter(IHorn horn, IHandleOrder orderHandler)
         {
+            _horn = horn;
             _orderHandler = orderHandler;
         }
 
@@ -23,9 +25,9 @@ namespace Restaurant
                 LineItems = itemQuantitySpec.Select(pair => new LineItemDto { Item = pair.Key, Quantity = pair.Value }).ToList()
             };
 
-            Console.WriteLine($"[waiter]: placing new order {order.OrderId}.");
+            _horn.Say($"[waiter]: placing new order {order.OrderId}.");
             _orderHandler.Handle(new Order(order));
-            Console.WriteLine($"[waiter]: placed new order {order.OrderId}.");
+            _horn.Say($"[waiter]: placed new order {order.OrderId}.");
 
             return orderId;
         }

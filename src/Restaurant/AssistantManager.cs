@@ -6,16 +6,18 @@ namespace Restaurant
 {
     public class AssistantManager : IHandleOrder
     {
+        private readonly IHorn _horn;
         private readonly IHandleOrder _orderHandler;
 
-        public AssistantManager(IHandleOrder orderHandler)
+        public AssistantManager(IHorn horn, IHandleOrder orderHandler)
         {
+            _horn = horn;
             _orderHandler = orderHandler;
         }
 
         public void Handle(Order order)
         {
-            Console.WriteLine($"[asstManager]: calculating prices for {order.OrderId}.");
+            _horn.Say($"[asstManager]: calculating prices for {order.OrderId}.");
 
             Thread.Sleep(250);
             var random = new Random();
