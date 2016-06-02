@@ -9,6 +9,24 @@ namespace Restaurant
         public static void Main()
         {
             var ordersCount = 10;
+            var wireUpResult = WireUp();
+            wireUpResult.Startables.ForEach(x => x.Start());
+
+            for (var i = 0; i < ordersCount; ++i)
+            {
+                var orderId = wireUpResult.Waiter
+                    .PlaceNewOrder(new Dictionary<string, int>
+                    {
+                        {"meat", 2}
+                    });
+                Console.WriteLine($"[outer user]: got order handle {orderId}.");
+            }
+            Console.WriteLine("[outer user]: placed all orders.");
+            Console.ReadKey(false);
+        }
+
+        private static WireUpResult WireUp()
+        {
             var cookNames = new[]
             {
                 "Joe",
@@ -18,23 +36,20 @@ namespace Restaurant
             var assistantManager = new AssistantManager(
                 new Cashier(new Printer())
                 );
+
+            var queuedHandlers = cookNames
+                .Select(cookName => new Cook(cookName, assistantManager))
+                .Select(x => new QueuedHandler(x))
+                .ToList();
             var waiter = new Waiter(
                 new RoundRobinDispatcher(
-                    cookNames.Select(cookName => new Cook(cookName, assistantManager))
-                    )
+                    queuedHandlers)
                 );
-
-            for (var i = 0; i < ordersCount; ++i)
+            return new WireUpResult
             {
-                var orderId = waiter
-                    .PlaceNewOrder(new Dictionary<string, int>
-                    {
-                        {"meat", 2}
-                    });
-                Console.WriteLine($"[outer user]: got order handle {orderId}.");
-            }
-            Console.WriteLine("[outer user]: placed all orders.");
-            Console.ReadKey(false);
+                Waiter = waiter,
+                Startables = queuedHandlers.Cast<IStartable>().ToList()
+            };
         }
     }
 }
