@@ -19,7 +19,7 @@ namespace Restaurant
             Thread.Sleep(1000);
 
             order.IsPaid = true;
-            _handleOrder.Handle(order);
+            _handleOrder.Handle(new Order(order));
         }
     }
 }

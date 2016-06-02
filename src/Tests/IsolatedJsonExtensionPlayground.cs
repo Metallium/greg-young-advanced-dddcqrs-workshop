@@ -1,9 +1,9 @@
-﻿using System;
-using System.Linq;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Restaurant;
+using System;
+using System.Linq;
 
 namespace Tests
 {
@@ -45,6 +45,29 @@ namespace Tests
             Assert.That(lineItemDto.Item, Is.EqualTo("Item"));
             Assert.That(lineItemDto.Price, Is.EqualTo(100));
             Assert.That(lineItemDto.Quantity, Is.EqualTo(1));
+        }
+
+
+        [Test]
+        public void CreateOrderFromOrder_CopiesAllValues()
+        {
+            var originalOrder = new Order
+            {
+                Ingredients = "meat, more meat and some bread",
+                IsPaid = false,
+                IsShittyCustomer = false,
+                OrderId = Guid.NewGuid().ToString("N"),
+                LineItems = new[] {
+                          new LineItemDto { Item = "burger", Price = 100, Quantity = 3 },
+                          new LineItemDto { Item = "smth", Price = 120, Quantity = 2 }
+                     },
+                TableNumber = 5,
+                Tax = 15,
+                Totals = 100500
+            };
+
+            var orderCopy = new Order(originalOrder);
+            Assert.That(originalOrder.MutableContainer.ToString(), Is.EqualTo(orderCopy.MutableContainer.ToString()));
         }
     }
 }

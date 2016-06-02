@@ -27,11 +27,11 @@ namespace Restaurant
                 Quantity = x.Quantity
             }).ToList();
             var totalPerItems = order.LineItems.Select(x => x.Price).Sum();
-            var tax = (int) Math.Round(0.2*totalPerItems);
+            var tax = (int)Math.Round(0.2 * totalPerItems);
             order.Tax = tax;
             order.Totals = tax + totalPerItems;
 
-            _orderHandler.Handle(order);
+            _orderHandler.Handle(new Order(order));
         }
     }
 }

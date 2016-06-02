@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json.Linq;
 
 namespace Restaurant
 {
@@ -9,6 +9,11 @@ namespace Restaurant
         public Order()
         {
             MutableContainer = new JObject();
+        }
+
+        public Order(Order originalOrder)
+        {
+            MutableContainer = originalOrder.MutableContainer.DeepClone();
         }
 
         public Order(JObject rootObject)
@@ -34,7 +39,7 @@ namespace Restaurant
         {
             get
             {
-                var lineItems = (JArray) MutableContainer.Root[nameof(LineItems)];
+                var lineItems = (JArray)MutableContainer.Root[nameof(LineItems)];
                 return lineItems?.Select(x => new LineItemDto
                 {
                     Item = x[nameof(LineItemDto.Item)].Value<string>(),

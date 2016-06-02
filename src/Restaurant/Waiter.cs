@@ -20,11 +20,11 @@ namespace Restaurant
             var order = new Order
             {
                 OrderId = orderId.ToString("N"),
-                LineItems = itemQuantitySpec.Select(pair => new LineItemDto {Item = pair.Key, Quantity = pair.Value}).ToList()
+                LineItems = itemQuantitySpec.Select(pair => new LineItemDto { Item = pair.Key, Quantity = pair.Value }).ToList()
             };
             Console.WriteLine($"Waiter: placing new order {order.OrderId}.");
 
-            _orderHandler.Handle(order);
+            _orderHandler.Handle(new Order(order));
             return orderId;
         }
     }
