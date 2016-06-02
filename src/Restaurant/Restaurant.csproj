@@ -53,6 +53,7 @@
     <Compile Include="Cook.cs" />
     <Compile Include="IHandleOrder.cs" />
     <Compile Include="LineItemDto.cs" />
+    <Compile Include="Multiplexor.cs" />
     <Compile Include="Order.cs" />
     <Compile Include="Printer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

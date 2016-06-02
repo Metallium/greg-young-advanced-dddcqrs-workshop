@@ -11,11 +11,12 @@ namespace Restaurant
             var ordersCount = 10;
             for (var i = 0; i < ordersCount; ++i)
             {
+                var assistantManager = new AssistantManager(
+                    new Cashier(new Printer())
+                    );
                 var orderId = new Waiter(
-                    new Cook(
-                        new AssistantManager(
-                            new Cashier(new Printer())
-                            )
+                    new Multiplexor(
+                        Enumerable.Range(0, 3).Select(x => new Cook(assistantManager))
                         )
                     )
                     .PlaceNewOrder(new Dictionary<string, int>
