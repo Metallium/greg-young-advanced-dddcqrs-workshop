@@ -73,10 +73,10 @@ namespace Restaurant
 
             var waiter = new Waiter(topicBasedPubSub, horn);
 
-            topicBasedPubSub.Subscribe<OrderPaid>(printer);
-            topicBasedPubSub.Subscribe<OrderPriced>(cashier);
-            topicBasedPubSub.Subscribe<OrderCooked>(assistantManager);
-            topicBasedPubSub.Subscribe<OrderPlaced>(megaCook);
+            topicBasedPubSub.SubscribeByType<OrderPaid>(printer);
+            topicBasedPubSub.SubscribeByType<OrderPriced>(cashier);
+            topicBasedPubSub.SubscribeByType<OrderCooked>(assistantManager);
+            topicBasedPubSub.SubscribeByType<OrderPlaced>(megaCook);
 
             var items = cooks.Concat(new object[]
             {

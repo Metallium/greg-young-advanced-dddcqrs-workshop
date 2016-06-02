@@ -25,7 +25,7 @@ namespace Restaurant
             ((IHandle<TMessage>)handler).Handle(message);
         }
 
-        public void Subscribe<TMessage>(IHandle<TMessage> handler)
+        public void SubscribeByType<TMessage>(IHandle<TMessage> handler)
             where TMessage : class, IMessage
         {
             _subs.Add(typeof(TMessage).FullName, handler);
