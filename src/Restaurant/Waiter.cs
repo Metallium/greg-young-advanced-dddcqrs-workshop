@@ -26,7 +26,7 @@ namespace Restaurant
             };
 
             _horn.Say($"[waiter]: placing new order {order.OrderId}.");
-            _publisher.Publish(TopicNames.OrderPlaced, new Order(order));
+            _publisher.Publish(new OrderPlaced(new Order(order)));
             _horn.Say($"[waiter]: placed new order {order.OrderId}.");
 
             return orderId;

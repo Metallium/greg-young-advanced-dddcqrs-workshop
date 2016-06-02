@@ -9,29 +9,35 @@ namespace Restaurant
         void Start();
     }
 
-    public class QueuedHandler : IHandleOrder, IStartable
+    public interface ITrackable
+    {
+        string QueueName { get; }
+        int QueueDepth { get; }
+    }
+
+    public class QueuedHandler<TMessage> : IHandle<TMessage>, IStartable, ITrackable
     {
         public string QueueName { get; }
         public int QueueDepth => _concurrentQueue.Count;
 
-        private readonly IHandleOrder _orderHandler;
-        private readonly ConcurrentQueue<Order> _concurrentQueue;
+        private readonly IHandle<TMessage> _handler;
+        private readonly ConcurrentQueue<TMessage> _concurrentQueue;
         private bool _started;
 
-        public QueuedHandler(string queueName, IHandleOrder orderHandler)
+        public QueuedHandler(string queueName, IHandle<TMessage> handler)
         {
+            _handler = handler;
             QueueName = queueName;
-            _orderHandler = orderHandler;
-            _concurrentQueue = new ConcurrentQueue<Order>();
+            _concurrentQueue = new ConcurrentQueue<TMessage>();
         }
 
-        public void Handle(Order order)
+        public void Handle(TMessage message)
         {
             if (!_started)
             {
                 throw new InvalidOperationException();
             }
-            _concurrentQueue.Enqueue(order);
+            _concurrentQueue.Enqueue(message);
         }
 
         public void Start()
@@ -49,10 +55,10 @@ namespace Restaurant
         {
             while (true)
             {
-                Order order;
-                if (_concurrentQueue.TryDequeue(out order))
+                TMessage message;
+                if (_concurrentQueue.TryDequeue(out message))
                 {
-                    _orderHandler.Handle(order);
+                    _handler.Handle(message);
                 }
                 else
                 {

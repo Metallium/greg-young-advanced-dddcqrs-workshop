@@ -1,29 +1,31 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Restaurant
 {
     public interface IPublisher
     {
-        void Publish(string topicName, Order order);
+        void Publish<TMessage>(TMessage message);
     }
 
     public class TopicBasedPubSub : IPublisher
     {
-        private readonly Dictionary<string, IHandleOrder> _subs;
+        private readonly Dictionary<Type, object> _subs;
 
         public TopicBasedPubSub()
         {
-            _subs = new Dictionary<string, IHandleOrder>();
+            _subs = new Dictionary<Type, object>();
         }
 
-        public void Publish(string topicName, Order order)
+        public void Publish<TMessage>(TMessage message)
         {
-            _subs[topicName].Handle(order);
+            var handler = _subs[typeof(TMessage)];
+            ((IHandle<TMessage>)handler).Handle(message);
         }
 
-        public void Subscribe(string topicName, IHandleOrder orderHandler)
+        public void Subscribe<TMessage>(IHandle<TMessage> handler)
         {
-            _subs.Add(topicName, orderHandler);
+            _subs.Add(typeof(TMessage), handler);
         }
     }
 }

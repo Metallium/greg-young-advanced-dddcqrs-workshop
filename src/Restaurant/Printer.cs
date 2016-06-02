@@ -2,7 +2,7 @@
 
 namespace Restaurant
 {
-    public class Printer : IHandleOrder
+    public class Printer : IHandle<OrderPaid>
     {
         private readonly IHorn _horn;
 
@@ -11,11 +11,11 @@ namespace Restaurant
             _horn = horn;
         }
 
-        public void Handle(Order order)
+        public void Handle(OrderPaid message)
         {
             _horn.Say("[printer]: printing");
             Thread.Sleep(750);
-            _horn.Say("[printer]: " + order.MutableContainer);
+            _horn.Say("[printer]: " + message.Order.MutableContainer);
         }
     }
 }

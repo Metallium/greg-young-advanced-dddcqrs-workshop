@@ -1,21 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace Restaurant
 {
-    public class Multiplexor : IHandleOrder
+    public class Multiplexor<TMessage> : IHandle<TMessage>
     {
-        private readonly List<IHandleOrder> _orderHandlers;
+        private readonly IList<IHandle<TMessage>> _orderHandlers;
 
-        public Multiplexor(IEnumerable<IHandleOrder> orderHandlers)
+        public Multiplexor(IList<IHandle<TMessage>> handlers)
         {
-            _orderHandlers = orderHandlers.ToList();
+            _orderHandlers = handlers.ToList();
         }
 
-        public void Handle(Order order)
+        public void Handle(TMessage message)
         {
-            _orderHandlers.ForEach(x => x.Handle(order));
+            _orderHandlers.ForEach(x => x.Handle(message));
         }
     }
 }

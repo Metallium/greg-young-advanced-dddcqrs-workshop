@@ -53,8 +53,9 @@
     <Compile Include="ConsoleHorn.cs" />
     <Compile Include="Cook.cs" />
     <Compile Include="EnumerableExtensions.cs" />
-    <Compile Include="IHandleOrder.cs" />
+    <Compile Include="IHandle.cs" />
     <Compile Include="IHorn.cs" />
+    <Compile Include="IMessage.cs" />
     <Compile Include="LineItemDto.cs" />
     <Compile Include="MoreFairDispatcher.cs" />
     <Compile Include="QueuedHandler.cs" />
@@ -65,7 +66,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SilentHorn.cs" />
     <Compile Include="TopicBasedPubSub.cs" />
-    <Compile Include="TopicNames.cs" />
     <Compile Include="Waiter.cs" />
     <Compile Include="WireUpResult.cs" />
   </ItemGroup>

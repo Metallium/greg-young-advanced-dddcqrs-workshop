@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace Restaurant
 {
-    public class AssistantManager : IHandleOrder
+    public class AssistantManager : IHandle<OrderCooked>
     {
         private readonly IPublisher _publisher;
         private readonly IHorn _horn;
@@ -15,8 +15,9 @@ namespace Restaurant
             _horn = horn;
         }
 
-        public void Handle(Order order)
+        public void Handle(OrderCooked message)
         {
+            var order = message.Order;
             _horn.Say($"[asstManager]: calculating prices for {order.OrderId}.");
 
             Thread.Sleep(250);
@@ -33,7 +34,7 @@ namespace Restaurant
             order.Tax = tax;
             order.Totals = tax + totalPerItems;
 
-            _publisher.Publish(TopicNames.OrderCalculated, new Order(order));
+            _publisher.Publish(new OrderPriced(new Order(order)));
         }
     }
 }

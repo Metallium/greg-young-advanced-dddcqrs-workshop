@@ -1,10 +1,8 @@
-using System;
-using System.Linq;
 using System.Threading;
 
 namespace Restaurant
 {
-    public class Cook : IHandleOrder
+    public class Cook : IHandle<OrderPlaced>
     {
         private readonly IPublisher _publisher;
         private readonly IHorn _horn;
@@ -19,14 +17,15 @@ namespace Restaurant
             _processingTime = processingTime;
         }
 
-        public void Handle(Order order)
+        public void Handle(OrderPlaced message)
         {
+            var order = message.Order;
             _horn.Say($"[cook] {_cookName}: cooking order {order.OrderId}.");
             Thread.Sleep(_processingTime);
             order.Ingredients = "some stuff";
             _horn.Say($"[cook] {_cookName}: cooked order {order.OrderId}.");
 
-            _publisher.Publish(TopicNames.OrderCooked, new Order(order));
+            _publisher.Publish(new OrderCooked(new Order(order)));
         }
     }
 }

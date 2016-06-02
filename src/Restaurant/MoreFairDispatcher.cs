@@ -4,24 +4,24 @@ using System.Threading;
 
 namespace Restaurant
 {
-    public class MoreFairDispatcher : IHandleOrder
+    public class MoreFairDispatcher<TMessage> : IHandle<TMessage>
     {
-        private readonly IList<QueuedHandler> _queuedHandlers;
+        private readonly IList<QueuedHandler<TMessage>> _queuedHandlers;
 
-        public MoreFairDispatcher(IList<QueuedHandler> queuedHandlers)
+        public MoreFairDispatcher(IList<QueuedHandler<TMessage>> queuedHandlers)
         {
             _queuedHandlers = queuedHandlers;
         }
 
-        public void Handle(Order order)
+        public void Handle(TMessage message)
         {
-            IHandleOrder handler;
+            IHandle<TMessage> handler;
             do
             {
                 handler = _queuedHandlers.FirstOrDefault(x => x.QueueDepth < 5);
                 Thread.Sleep(1);
             } while (handler == null);
-            handler.Handle(order);
+            handler.Handle(message);
         }
     }
 }

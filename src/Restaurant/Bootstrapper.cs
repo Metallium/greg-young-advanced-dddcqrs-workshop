@@ -15,7 +15,7 @@ namespace Restaurant
             var horn = new ConsoleHorn();
             var wireUpResult = WireUp();
             wireUpResult.Startables.ForEach(x => x.Start());
-            StartPrintingQueueStats(horn, wireUpResult.TrackableHandlers);
+            StartPrintingQueueStats(horn, wireUpResult.Trackables);
             var ordersCount = 100;
             for (var i = 0; i < ordersCount; ++i)
             {
@@ -30,13 +30,13 @@ namespace Restaurant
             Console.ReadKey(false);
         }
 
-        private static void StartPrintingQueueStats(IHorn horn, IList<QueuedHandler> queuedHandlers)
+        private static void StartPrintingQueueStats(IHorn horn, IList<ITrackable> trackables)
         {
             var thread = new Thread(() =>
             {
                 while (true)
                 {
-                    var stats = queuedHandlers.ToDictionary(x => x.QueueName, x => x.QueueDepth);
+                    var stats = trackables.ToDictionary(x => x.QueueName, x => x.QueueDepth);
                     horn.Note("[stats]: " + JsonConvert.SerializeObject(stats, Formatting.Indented));
                     Thread.Sleep(500);
                 }
@@ -69,16 +69,16 @@ namespace Restaurant
                             new Cook(topicBasedPubSub, horn, cookName, random.Next(0, 10000))))
                 .ToList();
 
-            var megaCook = AsQueueable("CookDispatcher", new MoreFairDispatcher(cooks));
+            var megaCook = AsQueueable("CookDispatcher", new MoreFairDispatcher<OrderPlaced>(cooks));
 
             var waiter = new Waiter(topicBasedPubSub, horn);
 
-            topicBasedPubSub.Subscribe(TopicNames.OrderPaid, printer);
-            topicBasedPubSub.Subscribe(TopicNames.OrderCalculated, cashier);
-            topicBasedPubSub.Subscribe(TopicNames.OrderCooked, assistantManager);
-            topicBasedPubSub.Subscribe(TopicNames.OrderPlaced, megaCook);
+            topicBasedPubSub.Subscribe<OrderPaid>(printer);
+            topicBasedPubSub.Subscribe<OrderPriced>(cashier);
+            topicBasedPubSub.Subscribe<OrderCooked>(assistantManager);
+            topicBasedPubSub.Subscribe<OrderPlaced>(megaCook);
 
-            var trackableHandlers = cooks.Concat(new[]
+            var items = cooks.Concat(new object[]
             {
                 megaCook,
                 cashier,
@@ -88,16 +88,18 @@ namespace Restaurant
             return new WireUpResult
             {
                 Waiter = waiter,
-                Startables = trackableHandlers
+                Startables = items
                     .Cast<IStartable>()
                     .ToList(),
-                TrackableHandlers = trackableHandlers
+                Trackables = items
+                    .Cast<ITrackable>()
+                    .ToList(),
             };
         }
 
-        private static QueuedHandler AsQueueable(string queueName, IHandleOrder orderHandler)
+        private static QueuedHandler<TMessage> AsQueueable<TMessage>(string queueName, IHandle<TMessage> handler)
         {
-            return new QueuedHandler(queueName, orderHandler);
+            return new QueuedHandler<TMessage>(queueName, handler);
         }
     }
 }
