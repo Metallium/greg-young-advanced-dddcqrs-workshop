@@ -30,4 +30,18 @@
         {
         }
     }
+
+    public class OrderFinalized : OrderMessage
+    {
+        public OrderFinalized(IMessage causationMessage, Order order) : base(causationMessage, order)
+        {
+        }
+    }
+
+    public class CookingTimedOut : OrderMessage
+    {
+        public CookingTimedOut(IMessage causationMessage, Order order) : base(causationMessage, order)
+        {
+        }
+    }
 }

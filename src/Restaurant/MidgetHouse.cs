@@ -30,6 +30,7 @@ namespace Restaurant
             _midgets[message.CorellationId] = midget;
             _topicBasedPubSub.SubscribeByCorellationId<OrderPlaced>(message.CorellationId, midget);
             _topicBasedPubSub.SubscribeByCorellationId<OrderCooked>(message.CorellationId, midget);
+            _topicBasedPubSub.SubscribeByCorellationId<CookingTimedOut>(message.CorellationId, midget);
             _topicBasedPubSub.SubscribeByCorellationId<OrderPriced>(message.CorellationId, midget);
             _topicBasedPubSub.SubscribeByCorellationId<OrderPaid>(message.CorellationId, midget);
 

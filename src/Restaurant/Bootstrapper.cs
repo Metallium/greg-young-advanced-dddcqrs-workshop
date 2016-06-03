@@ -17,16 +17,16 @@ namespace Restaurant
 
             var wireUpResult = WireUp(topicBasedPubSub);
             wireUpResult.Startables.ForEach(x => x.Start());
-            StartPrintingQueueStats(horn, wireUpResult.Trackables);
+            StartPrintingQueueStats(horn, wireUpResult.Trackables, wireUpResult.StatsProjection);
 
             topicBasedPubSub.SubscribeByType(wireUpResult.MidgetHouse);
 
-            var ordersCount = 100;
+            var ordersCount = 10;
             for (var i = 0; i < ordersCount; ++i)
             {
                 var isDrinker = i%2 == 0;
                 var orderId = Guid.NewGuid();
-                topicBasedPubSub.SubscribeByCorellationId(orderId, new StatusPrinter(orderId.ToString("N")));
+                topicBasedPubSub.SubscribeByCorellationId(orderId, new MessageTracer(orderId.ToString("N")));
                 wireUpResult.Waiter
                     .PlaceNewOrder(orderId, new Dictionary<string, int>
                     {
@@ -39,14 +39,17 @@ namespace Restaurant
             Console.ReadKey(false);
         }
 
-        private static void StartPrintingQueueStats(IHorn horn, IList<ITrackable> trackables)
+        private static void StartPrintingQueueStats(IHorn horn, IList<ITrackable> trackables, StatsProjection statsProjection)
         {
             var thread = new Thread(() =>
             {
                 while (true)
                 {
-                    var stats = trackables.ToDictionary(x => x.QueueName, x => x.QueueDepth);
-                    horn.Note("[stats]: " + JsonConvert.SerializeObject(stats, Formatting.Indented));
+                    horn.Note("[stats]: " + JsonConvert.SerializeObject(new
+                    {
+                        queueLengths = trackables.ToDictionary(x => x.QueueName, x => x.QueueDepth),
+                        statsProjection = statsProjection
+                    }, Formatting.Indented));
                     Thread.Sleep(500);
                 }
             }) {IsBackground = true};
@@ -74,7 +77,7 @@ namespace Restaurant
                 .Select(
                     cookName =>
                         AsQueueable($"{nameof(Cook)}-{cookName}",
-                            new Cook(topicBasedPubSub, horn, cookName, random.Next(0, 10000))))
+                            new DroppingHandler<CookFood>(new Cook(topicBasedPubSub, horn, cookName, random.Next(0, 10000)))))
                 .ToList();
 
             var megaCook = AsQueueable("CookDispatcher", new MoreFairDispatcher<CookFood>(cooks));
@@ -96,6 +99,10 @@ namespace Restaurant
                 midgetHouse
             }).ToList();
 
+            var statsProjection = new StatsProjection();
+            topicBasedPubSub.SubscribeByType<OrderPlaced>(statsProjection);
+            topicBasedPubSub.SubscribeByType<OrderFinalized>(statsProjection);
+
             return new WireUpResult
             {
                 Waiter = waiter,
@@ -106,6 +113,7 @@ namespace Restaurant
                     .Cast<ITrackable>()
                     .ToList(),
                 MidgetHouse = midgetHouse,
+                StatsProjection = statsProjection
             };
         }
 

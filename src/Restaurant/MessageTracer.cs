@@ -2,12 +2,12 @@ using System;
 
 namespace Restaurant
 {
-    public class StatusPrinter :
+    public class MessageTracer :
         IHandle<IMessage>
     {
         private readonly string _topic;
 
-        public StatusPrinter(string topic)
+        public MessageTracer(string topic)
         {
             _topic = topic;
         }

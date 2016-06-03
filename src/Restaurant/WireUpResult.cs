@@ -8,5 +8,6 @@ namespace Restaurant
         public Waiter Waiter { get; set; }
         public IList<ITrackable> Trackables { get; set; }
         public IHandle<OrderPlaced> MidgetHouse { get; set; }
+        public StatsProjection StatsProjection { get; set; }
     }
 }
