@@ -32,6 +32,21 @@
         {
             _handler.Handle((TOutput) message); // will throw if message type is wrong
         }
+
+        public override string ToString()
+        {
+            return $"NarrowingHandler<{typeof(TInput).Name}, {typeof(TOutput).Name}>({_handler})";
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj?.Equals(_handler) == true || _handler?.Equals(obj) == true;
+        }
+
+        public override int GetHashCode()
+        {
+            return _handler.GetHashCode();
+        }
     }
 
     public class WideningHandler<TInput, TOutput> : IHandle<TInput>
@@ -53,6 +68,16 @@
         public override string ToString()
         {
             return $"WideningHandler<{typeof (TInput).Name}, {typeof (TOutput).Name}>({_handler})";
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj?.Equals(_handler) == true || _handler?.Equals(obj) == true;
+        }
+
+        public override int GetHashCode()
+        {
+            return _handler.GetHashCode();
         }
     }
 }
