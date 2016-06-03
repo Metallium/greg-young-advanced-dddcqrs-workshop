@@ -2,51 +2,62 @@
 
 namespace Restaurant
 {
-    public class CookFood : IMessage
+    public abstract class OrderMessage : IdentifiedMessage
     {
-        public CookFood(Order order)
+        protected OrderMessage(Order order) : base(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid())
         {
             Order = order;
         }
-        public Guid MessageId { get; } = Guid.NewGuid();
-        public Guid CorellationId { get; } = Guid.NewGuid();
-        public Guid CausationId { get; } = Guid.NewGuid();
+
+        protected OrderMessage(IMessage causationMessage, Order order) : base(causationMessage)
+        {
+            Order = order;
+        }
+
         public Order Order { get; }
     }
 
-    public class PriceOrder : IMessage
+    public class CookFood : OrderMessage
     {
-        public PriceOrder(Order order)
+        public CookFood(Order order) : base(order)
         {
-            Order = order;
         }
-        public Guid MessageId { get; } = Guid.NewGuid();
-        public Guid CorellationId { get; } = Guid.NewGuid();
-        public Guid CausationId { get; } = Guid.NewGuid();
-        public Order Order { get; }
+
+        public CookFood(IMessage causationMessage, Order order) : base(causationMessage, order)
+        {
+        }
     }
 
-    public class TakePayment : IMessage
+    public class PriceOrder : OrderMessage
     {
-        public TakePayment(Order order)
+        public PriceOrder(Order order) : base(order)
         {
-            Order = order;
         }
-        public Guid MessageId { get; } = Guid.NewGuid();
-        public Guid CorellationId { get; } = Guid.NewGuid();
-        public Guid CausationId { get; } = Guid.NewGuid();
-        public Order Order { get; }
+
+        public PriceOrder(IMessage causationMessage, Order order) : base(causationMessage, order)
+        {
+        }
     }
 
-    public class PrintReceipt : IMessage
+    public class TakePayment : OrderMessage
     {
-        public PrintReceipt(Order order)
+        public TakePayment(Order order) : base(order)
         {
-            Order = order;
         }
-        public Guid MessageId { get; } = Guid.NewGuid();
-        public Guid CorellationId { get; } = Guid.NewGuid();
-        public Guid CausationId { get; } = Guid.NewGuid();
-        public Order Order { get; }
+
+        public TakePayment(IMessage causationMessage, Order order) : base(causationMessage, order)
+        {
+        }
+    }
+
+    public class PrintReceipt : OrderMessage
+    {
+        public PrintReceipt(Order order) : base(order)
+        {
+        }
+
+        public PrintReceipt(IMessage causationMessage, Order order) : base(causationMessage, order)
+        {
+        }
     }
 }

@@ -1,60 +1,30 @@
-﻿using System;
-
-namespace Restaurant
+﻿namespace Restaurant
 {
-    public class OrderPlaced : IMessage
+    public class OrderPlaced : OrderMessage
     {
-        public OrderPlaced(Order order)
+        public OrderPlaced(Order order) : base(order)
         {
-            Order = order;
         }
-
-        public Order Order { get; set; }
-
-        public Guid MessageId { get; } = Guid.NewGuid();
-        public Guid CorellationId { get; } = Guid.NewGuid();
-        public Guid CausationId { get; } = Guid.NewGuid();
     }
 
-    public class OrderCooked : IMessage
+    public class OrderCooked : OrderMessage
     {
-        public OrderCooked(Order order)
+        public OrderCooked(IMessage causationMessage, Order order) : base(causationMessage, order)
         {
-            Order = order;
         }
-
-        public Order Order { get; set; }
-
-        public Guid MessageId { get; } = Guid.NewGuid();
-        public Guid CorellationId { get; } = Guid.NewGuid();
-        public Guid CausationId { get; } = Guid.NewGuid();
     }
 
-    public class OrderPriced : IMessage
+    public class OrderPriced : OrderMessage
     {
-        public OrderPriced(Order order)
+        public OrderPriced(IMessage causationMessage, Order order) : base(causationMessage, order)
         {
-            Order = order;
         }
-
-        public Order Order { get; set; }
-
-        public Guid MessageId { get; } = Guid.NewGuid();
-        public Guid CorellationId { get; } = Guid.NewGuid();
-        public Guid CausationId { get; } = Guid.NewGuid();
     }
 
-    public class OrderPaid : IMessage
+    public class OrderPaid : OrderMessage
     {
-        public OrderPaid(Order order)
+        public OrderPaid(IMessage causationMessage, Order order) : base(causationMessage, order)
         {
-            Order = order;
         }
-
-        public Order Order { get; set; }
-
-        public Guid MessageId { get; } = Guid.NewGuid();
-        public Guid CorellationId { get; } = Guid.NewGuid();
-        public Guid CausationId { get; } = Guid.NewGuid();
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Restaurant
 {
-    public class Cashier : IHandle<OrderPriced>
+    public class Cashier : IHandle<TakePayment>
     {
         private readonly IPublisher _publisher;
         private readonly IHorn _horn;
@@ -13,7 +13,7 @@ namespace Restaurant
             _horn = horn;
         }
 
-        public void Handle(OrderPriced message)
+        public void Handle(TakePayment message)
         {
             var order = message.Order;
             _horn.Say($"[cashier]: taking payment for {order.OrderId}.");
@@ -24,7 +24,7 @@ namespace Restaurant
 
             _horn.Say($"[cashier]: took payment for {order.OrderId}.");
 
-            _publisher.Publish(new OrderPaid(new Order(order)));
+            _publisher.Publish(new OrderPaid(message, new Order(order)));
         }
     }
 }

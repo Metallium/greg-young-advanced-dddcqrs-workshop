@@ -2,7 +2,7 @@ using System.Threading;
 
 namespace Restaurant
 {
-    public class Cook : IHandle<OrderPlaced>
+    public class Cook : IHandle<CookFood>
     {
         private readonly IPublisher _publisher;
         private readonly IHorn _horn;
@@ -17,7 +17,7 @@ namespace Restaurant
             _processingTime = processingTime;
         }
 
-        public void Handle(OrderPlaced message)
+        public void Handle(CookFood message)
         {
             var order = message.Order;
             _horn.Say($"[cook] {_cookName}: cooking order {order.OrderId}.");
@@ -25,7 +25,7 @@ namespace Restaurant
             order.Ingredients = "some stuff";
             _horn.Say($"[cook] {_cookName}: cooked order {order.OrderId}.");
 
-            _publisher.Publish(new OrderCooked(new Order(order)));
+            _publisher.Publish(new OrderCooked(message, new Order(order)));
         }
     }
 }

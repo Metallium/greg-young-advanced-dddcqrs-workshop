@@ -69,14 +69,14 @@ namespace Restaurant
                             new Cook(topicBasedPubSub, horn, cookName, random.Next(0, 10000))))
                 .ToList();
 
-            var megaCook = AsQueueable("CookDispatcher", new MoreFairDispatcher<OrderPlaced>(cooks));
+            var megaCook = AsQueueable("CookDispatcher", new MoreFairDispatcher<CookFood>(cooks));
 
             var waiter = new Waiter(topicBasedPubSub, horn);
 
-            topicBasedPubSub.SubscribeByType<OrderPaid>(printer);
-            topicBasedPubSub.SubscribeByType<OrderPriced>(cashier);
-            topicBasedPubSub.SubscribeByType<OrderCooked>(assistantManager);
-            topicBasedPubSub.SubscribeByType<OrderPlaced>(megaCook);
+            topicBasedPubSub.SubscribeByType<PrintReceipt>(printer);
+            topicBasedPubSub.SubscribeByType<TakePayment>(cashier);
+            topicBasedPubSub.SubscribeByType<PriceOrder>(assistantManager);
+            topicBasedPubSub.SubscribeByType<CookFood>(megaCook);
 
             var items = cooks.Concat(new object[]
             {
