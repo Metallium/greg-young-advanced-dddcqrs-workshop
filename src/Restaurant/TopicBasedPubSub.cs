@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -22,7 +23,13 @@ namespace Restaurant
         public void Publish<TMessage>(TMessage message)
             where TMessage : class, IMessage
         {
-            var topicName = typeof(TMessage).FullName;
+            PublishInternal(TypeToTopicName(typeof(TMessage)), message);
+            PublishInternal(CorellationIdToTopicName(message.CorellationId), message);
+        }
+
+        private void PublishInternal<TMessage>(string topicName, TMessage message)
+            where TMessage : class, IMessage
+        {
             List<IHandle<IMessage>> list;
 
             if (_subs.TryGetValue(topicName, out list))
@@ -37,6 +44,12 @@ namespace Restaurant
                 topicName,
                 key => new List<IHandle<IMessage>> {handler},
                 (key, currentList) => currentList.Concat(new [] {handler}).ToList());
+        }
+
+        public void SubscribeByCorellationId<TMessage>(Guid corellationId, IHandle<TMessage> handler)
+            where TMessage : IMessage
+        {
+            Subscribe(CorellationIdToTopicName(corellationId), handler.NarrowTo<IMessage, TMessage>());
         }
 
         public void SubscribeByType<TMessage>(IHandle<TMessage> handler)
@@ -56,7 +69,17 @@ namespace Restaurant
         public void UnsubscribeByType<TMessage>(IHandle<TMessage> handler)
             where TMessage : IMessage
         {
-            Unsubscribe(typeof(TMessage).FullName, handler.NarrowTo<IMessage, TMessage>());
+            Unsubscribe(TypeToTopicName(typeof(TMessage)), handler.NarrowTo<IMessage, TMessage>());
+        }
+
+        private static string TypeToTopicName(Type type)
+        {
+            return type.FullName;
+        }
+
+        private static string CorellationIdToTopicName(Guid corellationId)
+        {
+            return corellationId.ToString("N");
         }
     }
 }

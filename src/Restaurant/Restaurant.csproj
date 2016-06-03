@@ -50,9 +50,11 @@
     <Compile Include="AssistantManager.cs" />
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Cashier.cs" />
+    <Compile Include="Commands.cs" />
     <Compile Include="ConsoleHorn.cs" />
     <Compile Include="Cook.cs" />
     <Compile Include="EnumerableExtensions.cs" />
+    <Compile Include="Events.cs" />
     <Compile Include="HandleExtensions.cs" />
     <Compile Include="IHandle.cs" />
     <Compile Include="IHorn.cs" />

@@ -10,11 +10,16 @@ namespace Tests
     {
         public class TestMessage : IMessage
         {
-            public Guid Id { get; } = Guid.NewGuid();
+            public Guid MessageId { get; } = Guid.NewGuid();
+            public Guid CorellationId { get; } = Guid.NewGuid();
+            public Guid CausationId { get; } = Guid.NewGuid();
         }
+
         public class AnotherTestMessage : IMessage
         {
-            public Guid Id { get; } = Guid.NewGuid();
+            public Guid MessageId { get; } = Guid.NewGuid();
+            public Guid CorellationId { get; } = Guid.NewGuid();
+            public Guid CausationId { get; } = Guid.NewGuid();
         }
 
         [Test]
@@ -33,6 +38,20 @@ namespace Tests
             pubSub.SubscribeByType(handler);
             pubSub.Publish(new TestMessage());
             pubSub.Publish(new AnotherTestMessage());
+
+            handler.Received().Handle(Arg.Any<TestMessage>());
+        }
+
+        [Test]
+        public void PublishAlsoNotifiesCorellationIdSubscriptionTest()
+        {
+            var handler = Substitute.For<IHandle<TestMessage>>();
+
+            var pubSub = new TopicBasedPubSub();
+            var testMessage = new TestMessage();
+
+            pubSub.SubscribeByCorellationId(testMessage.CorellationId, handler);
+            pubSub.Publish(testMessage);
 
             handler.Received().Handle(Arg.Any<TestMessage>());
         }
