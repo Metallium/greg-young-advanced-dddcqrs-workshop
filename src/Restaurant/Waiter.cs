@@ -15,10 +15,8 @@ namespace Restaurant
             _horn = horn;
         }
 
-        public Guid PlaceNewOrder(IDictionary<string, int> itemQuantitySpec)
+        public void PlaceNewOrder(Guid orderId, IDictionary<string, int> itemQuantitySpec)
         {
-            var orderId = Guid.NewGuid();
-
             var order = new Order
             {
                 OrderId = orderId.ToString("N"),
@@ -26,10 +24,10 @@ namespace Restaurant
             };
 
             _horn.Say($"[waiter]: placing new order {order.OrderId}.");
-            _publisher.Publish(new OrderPlaced(new Order(order)));
-            _horn.Say($"[waiter]: placed new order {order.OrderId}.");
 
-            return orderId;
+            var isDodgyCustomer = itemQuantitySpec.Any(x => x.Key == GoodsMenu.Drinkables.Vodka);
+            _publisher.Publish(new OrderPlaced(isDodgyCustomer, new Order(order)));
+            _horn.Say($"[waiter]: placed new order {order.OrderId}.");
         }
     }
 }

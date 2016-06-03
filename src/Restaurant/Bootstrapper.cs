@@ -8,7 +8,7 @@ namespace Restaurant
 {
     public static class Bootstrapper
     {
-        const bool PrintDetails = false;
+        private const bool PrintDetails = false;
 
         public static void Main()
         {
@@ -19,18 +19,20 @@ namespace Restaurant
             wireUpResult.Startables.ForEach(x => x.Start());
             StartPrintingQueueStats(horn, wireUpResult.Trackables);
 
-            topicBasedPubSub.SubscribeByType<OrderPlaced>(wireUpResult.MidgetHouse);
+            topicBasedPubSub.SubscribeByType(wireUpResult.MidgetHouse);
 
             var ordersCount = 100;
             for (var i = 0; i < ordersCount; ++i)
             {
-                var orderId = wireUpResult.Waiter
-                    .PlaceNewOrder(new Dictionary<string, int>
+                var isDrinker = i%2 == 0;
+                var orderId = Guid.NewGuid();
+                topicBasedPubSub.SubscribeByCorellationId(orderId, new StatusPrinter(orderId.ToString("N")));
+                wireUpResult.Waiter
+                    .PlaceNewOrder(orderId, new Dictionary<string, int>
                     {
-                        {"meat", 2}
+                        {isDrinker ? GoodsMenu.Drinkables.Vodka : GoodsMenu.Eatables.Meat, 2}
                     });
-                var statusPrinter = new StatusPrinter();
-                topicBasedPubSub.SubscribeByCorellationId(orderId, statusPrinter);
+
                 horn.Say($"[outer user]: got order handle {orderId}.");
             }
             horn.Say("[outer user]: placed all orders.");

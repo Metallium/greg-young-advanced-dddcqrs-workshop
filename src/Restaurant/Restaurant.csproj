@@ -55,11 +55,14 @@
     <Compile Include="Cook.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="Events.cs" />
+    <Compile Include="Goods.cs" />
     <Compile Include="HandleExtensions.cs" />
     <Compile Include="IHandle.cs" />
     <Compile Include="IHorn.cs" />
     <Compile Include="IMessage.cs" />
+    <Compile Include="IMidget.cs" />
     <Compile Include="LineItemDto.cs" />
+    <Compile Include="ZimbabweanMidget.cs" />
     <Compile Include="LithuanianMidget.cs" />
     <Compile Include="MidgetHouse.cs" />
     <Compile Include="MoreFairDispatcher.cs" />

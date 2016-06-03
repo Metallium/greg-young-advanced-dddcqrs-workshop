@@ -2,9 +2,12 @@
 {
     public class OrderPlaced : OrderMessage
     {
-        public OrderPlaced(Order order) : base(order)
+        public OrderPlaced(bool isDodgyCustomer, Order order) : base(order)
         {
+            IsDodgyCustomer = isDodgyCustomer;
         }
+
+        public bool IsDodgyCustomer { get; }
     }
 
     public class OrderCooked : OrderMessage
