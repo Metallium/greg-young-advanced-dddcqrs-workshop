@@ -4,7 +4,8 @@ namespace Restaurant
 {
     public abstract class OrderMessage : IdentifiedMessage
     {
-        protected OrderMessage(Order order) : base(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid())
+        protected OrderMessage(Order order)
+            : base(Guid.Parse(order.OrderId), Guid.Parse(order.OrderId), Guid.NewGuid())
         {
             Order = order;
         }

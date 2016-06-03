@@ -7,5 +7,6 @@ namespace Restaurant
         public IList<IStartable> Startables { get; set; }
         public Waiter Waiter { get; set; }
         public IList<ITrackable> Trackables { get; set; }
+        public IHandle<OrderPlaced> MidgetHouse { get; set; }
     }
 }

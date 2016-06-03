@@ -163,5 +163,19 @@ namespace Tests
             Assert.That(narrowed1.Equals(narrowed2), Is.True);
             Assert.That(narrowed2.Equals(narrowed1), Is.True);
         }
+
+        [Test]
+        public void NarrowingIfYouCanHandlerEqualityTest()
+        {
+            var handler = Substitute.For<IHandle<TestMessage>>();
+            var narrowed1 = handler.NarrowToIfYouCan<IMessage, TestMessage>();
+
+            Assert.That(narrowed1.Equals(handler), Is.True);
+
+            var narrowed2 = handler.NarrowTo<IMessage, TestMessage>();
+
+            Assert.That(narrowed1.Equals(narrowed2), Is.True);
+            Assert.That(narrowed2.Equals(narrowed1), Is.True);
+        }
     }
 }

@@ -47,15 +47,20 @@ namespace Restaurant
         }
 
         public void SubscribeByCorellationId<TMessage>(Guid corellationId, IHandle<TMessage> handler)
-            where TMessage : IMessage
+            where TMessage : class, IMessage
         {
-            Subscribe(CorellationIdToTopicName(corellationId), handler.NarrowTo<IMessage, TMessage>());
+            Subscribe(CorellationIdToTopicName(corellationId), handler.NarrowToIfYouCan<IMessage, TMessage>());
+        }
+
+        public void SubscribeByCorellationId(Guid corellationId, IHandle<IMessage> handler)
+        {
+            Subscribe(CorellationIdToTopicName(corellationId), handler);
         }
 
         public void SubscribeByType<TMessage>(IHandle<TMessage> handler)
-            where TMessage : IMessage
+            where TMessage : class, IMessage
         {
-            Subscribe(typeof(TMessage).FullName, handler.NarrowTo<IMessage, TMessage>());
+            Subscribe(typeof(TMessage).FullName, handler.NarrowToIfYouCan<IMessage, TMessage>());
         }
 
         public void Unsubscribe(string topicName, IHandle<IMessage> handler)
@@ -67,9 +72,9 @@ namespace Restaurant
         }
 
         public void UnsubscribeByType<TMessage>(IHandle<TMessage> handler)
-            where TMessage : IMessage
+            where TMessage : class, IMessage
         {
-            Unsubscribe(TypeToTopicName(typeof(TMessage)), handler.NarrowTo<IMessage, TMessage>());
+            Unsubscribe(TypeToTopicName(typeof(TMessage)), handler.NarrowToIfYouCan<IMessage, TMessage>());
         }
 
         private static string TypeToTopicName(Type type)

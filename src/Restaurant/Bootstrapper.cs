@@ -13,9 +13,14 @@ namespace Restaurant
         public static void Main()
         {
             var horn = new ConsoleHorn();
-            var wireUpResult = WireUp();
+            var topicBasedPubSub = new TopicBasedPubSub();
+
+            var wireUpResult = WireUp(topicBasedPubSub);
             wireUpResult.Startables.ForEach(x => x.Start());
             StartPrintingQueueStats(horn, wireUpResult.Trackables);
+
+            topicBasedPubSub.SubscribeByType<OrderPlaced>(wireUpResult.MidgetHouse);
+
             var ordersCount = 100;
             for (var i = 0; i < ordersCount; ++i)
             {
@@ -24,6 +29,8 @@ namespace Restaurant
                     {
                         {"meat", 2}
                     });
+                var statusPrinter = new StatusPrinter();
+                topicBasedPubSub.SubscribeByCorellationId(orderId, statusPrinter);
                 horn.Say($"[outer user]: got order handle {orderId}.");
             }
             horn.Say("[outer user]: placed all orders.");
@@ -44,7 +51,7 @@ namespace Restaurant
             thread.Start();
         }
 
-        private static WireUpResult WireUp()
+        private static WireUpResult WireUp(TopicBasedPubSub topicBasedPubSub)
         {
             var horn = PrintDetails ? (IHorn)new ConsoleHorn() : new SilentHorn();
 
@@ -54,7 +61,6 @@ namespace Restaurant
                 "Greg",
                 "Bro"
             };
-            var topicBasedPubSub = new TopicBasedPubSub();
             var printer = new Printer(horn);
 
             var cashier = AsQueueable(nameof(Cashier), new Cashier(topicBasedPubSub, horn));
@@ -78,11 +84,14 @@ namespace Restaurant
             topicBasedPubSub.SubscribeByType<PriceOrder>(assistantManager);
             topicBasedPubSub.SubscribeByType<CookFood>(megaCook);
 
+            var midgetHouse = AsQueueable(nameof(MidgetHouse), new MidgetHouse(topicBasedPubSub));
+
             var items = cooks.Concat(new object[]
             {
                 megaCook,
                 cashier,
-                assistantManager
+                assistantManager,
+                midgetHouse
             }).ToList();
 
             return new WireUpResult
@@ -94,6 +103,7 @@ namespace Restaurant
                 Trackables = items
                     .Cast<ITrackable>()
                     .ToList(),
+                MidgetHouse = midgetHouse,
             };
         }
 
