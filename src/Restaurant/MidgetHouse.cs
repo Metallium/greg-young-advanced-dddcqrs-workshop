@@ -3,55 +3,22 @@ using System.Collections.Generic;
 
 namespace Restaurant
 {
-    public class Midget :
-        IHandle<OrderPlaced>,
-        IHandle<OrderCooked>,
-        IHandle<OrderPriced>,
-        IHandle<OrderPaid>
-    {
-        private readonly IPublisher _publisher;
-
-        public Midget(IPublisher publisher)
-        {
-            _publisher = publisher;
-        }
-
-        public void Handle(OrderPlaced message)
-        {
-            _publisher.Publish(new CookFood(message, message.Order));
-        }
-
-        public void Handle(OrderCooked message)
-        {
-            _publisher.Publish(new PriceOrder(message, message.Order));
-        }
-
-        public void Handle(OrderPriced message)
-        {
-            _publisher.Publish(new TakePayment(message, message.Order));
-        }
-
-        public void Handle(OrderPaid message)
-        {
-            _publisher.Publish(new PrintReceipt(message, message.Order));
-        }
-    }
     public class MidgetFactory
     {
-        public static Midget Create(TopicBasedPubSub topicBasedPubSub)
+        public static LithuanianMidget Create(TopicBasedPubSub topicBasedPubSub)
         {
-            return new Midget(topicBasedPubSub);
+            return new LithuanianMidget(topicBasedPubSub);
         }
     }
     public class MidgetHouse : IHandle<OrderPlaced>
     {
         private readonly TopicBasedPubSub _topicBasedPubSub;
-        private readonly Dictionary<Guid, Midget> _midgets;
+        private readonly Dictionary<Guid, LithuanianMidget> _midgets;
 
         public MidgetHouse(TopicBasedPubSub topicBasedPubSub)
         {
             _topicBasedPubSub = topicBasedPubSub;
-            _midgets = new Dictionary<Guid, Midget>();
+            _midgets = new Dictionary<Guid, LithuanianMidget>();
         }
 
         public void Handle(OrderPlaced message)

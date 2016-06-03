@@ -60,6 +60,7 @@
     <Compile Include="IHorn.cs" />
     <Compile Include="IMessage.cs" />
     <Compile Include="LineItemDto.cs" />
+    <Compile Include="LithuanianMidget.cs" />
     <Compile Include="MidgetHouse.cs" />
     <Compile Include="MoreFairDispatcher.cs" />
     <Compile Include="QueuedHandler.cs" />
